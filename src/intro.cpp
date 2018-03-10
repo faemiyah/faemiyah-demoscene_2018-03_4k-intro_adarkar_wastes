@@ -665,7 +665,13 @@ static void draw(GLsizei screen_w, GLsizei screen_h, int ticks)
     dnload_glViewport(0, 0, screen_w, screen_h);
     dnload_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+#if defined(USE_LD)
+    glActiveTexture(GL_TEXTURE0 + TEXTURE_COLOR_INDEX);
+    glBindTexture(GL_TEXTURE_2D, g_textures[TEXTURE_COLOR_INDEX]);
+    glGenerateMipmap(GL_TEXTURE_2D);
+#else
     dnload_glGenerateTextureMipmap(g_textures[TEXTURE_COLOR_INDEX]);
+#endif
 
     // Draw postproc quad.
     {
@@ -936,11 +942,11 @@ void _start()
 #endif
 
   dnload_glCreateFramebuffers(1, &g_fbo);
-  dnload_glNamedFramebufferTexture(g_fbo, GL_COLOR_ATTACHMENT0, g_textures[TEXTURE_COLOR_INDEX], 0);
-  dnload_glNamedFramebufferTexture(g_fbo, GL_DEPTH_ATTACHMENT, g_textures[TEXTURE_DEPTH_INDEX], 0);
 #if defined(USE_LD)
   {
     glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, g_textures[TEXTURE_COLOR_INDEX], 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, g_textures[TEXTURE_DEPTH_INDEX], 0);
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if(status != GL_FRAMEBUFFER_COMPLETE)
     {
@@ -950,6 +956,9 @@ void _start()
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
+#else
+  dnload_glNamedFramebufferTexture(g_fbo, GL_COLOR_ATTACHMENT0, g_textures[TEXTURE_COLOR_INDEX], 0);
+  dnload_glNamedFramebufferTexture(g_fbo, GL_DEPTH_ATTACHMENT, g_textures[TEXTURE_DEPTH_INDEX], 0);
 #endif
 
 #if defined(USE_LD)
