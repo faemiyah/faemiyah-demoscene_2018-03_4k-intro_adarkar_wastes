@@ -941,8 +941,8 @@ void _start()
   dnload_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 #endif
 
-  dnload_glCreateFramebuffers(1, &g_fbo);
 #if defined(USE_LD)
+  glGenFramebuffers(1, &g_fbo);
   {
     glBindFramebuffer(GL_FRAMEBUFFER, g_fbo);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, g_textures[TEXTURE_COLOR_INDEX], 0);
@@ -957,6 +957,7 @@ void _start()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
 #else
+  dnload_glCreateFramebuffers(1, &g_fbo);
   dnload_glNamedFramebufferTexture(g_fbo, GL_COLOR_ATTACHMENT0, g_textures[TEXTURE_COLOR_INDEX], 0);
   dnload_glNamedFramebufferTexture(g_fbo, GL_DEPTH_ATTACHMENT, g_textures[TEXTURE_DEPTH_INDEX], 0);
 #endif
